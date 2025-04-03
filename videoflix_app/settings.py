@@ -30,6 +30,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
+# Set your custom user model here
+AUTH_USER_MODEL = 'user_auth_app.CustomUser'
+
+
 
 # Application definition
 
