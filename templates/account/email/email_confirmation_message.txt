@@ -1,0 +1,16 @@
+Hallo {{ user.email }},
+
+vielen Dank für deine Registrierung bei {{ site.name }}!
+
+Um deine Registrierung abzuschließen, klicke bitte auf den folgenden Link oder den Button:
+
+{{ activate_url }}
+
+<p>
+  <a href="{{ activate_url }}">Hier E-Mail bestätigen</a>
+</p>
+
+Falls du dich nicht registriert hast, ignoriere bitte diese EMail.
+
+Mit freundlichen Grüßen,  
+Dein Team von {{ site.name }}
