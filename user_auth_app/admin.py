@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
-@admin.register(User)
 class CustomUserAdmin(BaseUserAdmin):
     """
     Custom Admin for the CustomUser model (AUTH_USER_MODEL),

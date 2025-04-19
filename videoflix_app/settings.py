@@ -166,6 +166,7 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+ACCOUNT_ADAPTER = "user_auth_app.adapter.HTMLOnlyAccountAdapter"
 
 # dj-rest-auth: JWT statt Token
 REST_USE_JWT = True
