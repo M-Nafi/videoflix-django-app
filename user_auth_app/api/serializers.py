@@ -1,68 +1,51 @@
+from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
-from django.contrib.auth import authenticate, get_user_model
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
+
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
+from allauth.account import app_settings as allauth_settings
+from allauth.account.models import EmailAddress
+
 User = get_user_model()
 
-class RegistrationSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user registration.
-    This serializer validates the input data (email, password, and repeated password)
-    and creates a new user with the given email and password.
-    """
-    repeated_password = serializers.CharField(write_only=True)
+class CustomRegisterSerializer(RegisterSerializer):
+    username = None
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    class Meta:
-        model = User
-        fields = ['email', 'password', 'repeated_password']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-
-    def save(self):
-        password = self.validated_data['password']
-        repeated_password = self.validated_data['repeated_password']
-        email = self.validated_data['email']
-
-        if password != repeated_password:
-            raise serializers.ValidationError({'password-error': 'Enter the password correctly!'})
-
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError({'email-error': 'This E-Mail address already exists.'})
-
-        user = User(email=email)
-        user.set_password(password)
-        user.save()
-        return user
-
-class LoginSerializer(serializers.Serializer):
-    """
-    Serializer for handling user login requests.
-    """
-    email = serializers.EmailField()
-    password = serializers.CharField(
-        style={'input_type': 'password'},
-        write_only=True,
-        trim_whitespace=False
-    )
-
+    def validate_email(self, email):
+        email = get_adapter().clean_email(email)
+        if allauth_settings.UNIQUE_EMAIL:
+            if EmailAddress.objects.filter(email__iexact=email, verified=True).exists():
+                raise serializers.ValidationError(
+                    _('A user is already registered with this e-mail address.')
+                )
+        return email
+    
     def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
-
-        if email and password:
-            user = authenticate(request=self.context.get('request'), email=email, password=password)
-            if not user:
-                raise serializers.ValidationError('Unable to log in with provided credentials.', code='authorization')
-        else:
-            raise serializers.ValidationError('Must include "email" and "password".', code='authorization')
-
-        attrs['user'] = user
+        if attrs.get('password1') != attrs.get('password2'):
+            raise serializers.ValidationError(
+                _("The two password fields didn't match.")
+            )
         return attrs
+    
+    def get_cleaned_data(self):
+        return {
+            'email': self.validated_data.get('email', ''),
+            'password1': self.validated_data.get('password1', ''),
+        }
+    
+    def save(self, request):
+        username = self.validated_data.get('email', '')
+        self.validated_data['username'] = username
+        return super().save(request)
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the CustomUser model.
-    Returns id, email, date_joined and last_login.
-    """
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'date_joined', 'last_login']
