@@ -35,6 +35,48 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
+# Custom user model here
+AUTH_USER_MODEL = 'user_auth_app.User'
+SITE_ID = 1
+
+# allauth-Konfiguration
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*',]
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+ACCOUNT_ADAPTER = "user_auth_app.adapter.HTMLOnlyAccountAdapter"
+
+# ----------------------------------------
+# dj-rest-auth JWT Settings
+# ----------------------------------------
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'user_auth_app.api.serializers.CustomRegisterSerializer',
+    'USE_JWT': True,
+    'SESSION_LOGIN' : False,
+    'JWT_AUTH_COOKIE' : 'access_token',
+    'JWT_AUTH_REFRESH_COOKIE' : 'refresh_token',
+    'JWT_AUTH_COOKIE_USE_CSRF' : True,
+    'JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED' : True,
+    'JWT_AUTH_HTTPONLY' : True,
+    'JWT_AUTH_SECURE' : False,
+    'JWT_AUTH_SAMESITE' : 'Lax',
+}
+
+
+# ----------------------------------------
+# Simple JWT Settings
+# ----------------------------------------
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),   # <-- kurzlebig :contentReference[oaicite:15]{index=15}
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # <-- längere Nutzungsdauer :contentReference[oaicite:16]{index=16}
+    'ROTATE_REFRESH_TOKENS': True,                   # <-- Token-Rotation :contentReference[oaicite:17]{index=17}
+    'BLACKLIST_AFTER_ROTATION': True,                # <-- Blacklist alter Tokens :contentReference[oaicite:18]{index=18}
+    'UPDATE_LAST_LOGIN': False,                      # optional
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -52,13 +94,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'user_auth_app',
     'drf_spectacular',
 ]
 
-# Custom user model here
-AUTH_USER_MODEL = 'user_auth_app.User'
-SITE_ID = 1
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -159,28 +199,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# allauth-Konfiguration
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*',]
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-ACCOUNT_ADAPTER = "user_auth_app.adapter.HTMLOnlyAccountAdapter"
-
-# dj-rest-auth: JWT statt Token
-REST_USE_JWT = True
-
-# Your CustomRegisterSerialiser is integrated here:
-REST_AUTH = {
-    'USE_JWT': True,
-    'REGISTER_SERIALIZER': 'user_auth_app.api.serializers.CustomRegisterSerializer',
-}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication', only with cookie auth
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [

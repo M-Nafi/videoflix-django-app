@@ -3,6 +3,7 @@ from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from dj_rest_auth.registration.views import VerifyEmailView
+from user_auth_app.api.views import get_csrf_token
 from allauth.account.views import ConfirmEmailView
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -15,6 +16,9 @@ urlpatterns = [
     #path('api/', redirect_to_schema, name='root'), only for production
     path('api/', redirect_to_admin, name='root'),
     #path('api/', include('user_auth_app.api.urls')), für mögliches Profile Edite
+    
+    # Neuer CSRF-Endpoint
+    path('api/auth/csrf/', get_csrf_token, name='get_csrf_token'),
     
     #GET‑Bestätigung über Link in der E‑Mail
     re_path(
