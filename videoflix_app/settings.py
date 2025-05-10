@@ -34,7 +34,6 @@ SECRET_KEY = 'django-insecure-(6or@t(ffo$j26w3tpud#&a$ad-t_q0&v%3m01%m($q6m60ix^
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
-
 # Custom user model here
 AUTH_USER_MODEL = 'user_auth_app.User'
 SITE_ID = 1
@@ -86,6 +85,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'corsheaders',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -105,7 +105,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -116,6 +116,7 @@ CSRF_TRUSTED_ORIGINS = [
 
   'http://127.0.0.1:5500',
   'http://localhost:5500',
+  'http://localhost:4200',
 
 ]
 
@@ -123,8 +124,14 @@ CORS_ALLOWED_ORIGINS = [
 
   'http://127.0.0.1:5500',
   'http://localhost:5500',
+  'http://localhost:4200',
 
 ]
+CORS_ALLOW_HEADERS = [
+'content-type',
+'x-csrftoken',
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'videoflix_app.urls'
 
