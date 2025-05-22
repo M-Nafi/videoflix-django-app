@@ -5,11 +5,16 @@ from django.conf import settings
 class Video(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    video_file = models.FileField(upload_to='videos/')
+    video_file = models.FileField(upload_to='videos/originals/')  # Nur dieses Feld wird manuell hochgeladen
     thumbnail = models.FileField(upload_to='thumbnails/')
     description = models.TextField(blank=True)
     genre = models.CharField(max_length=50, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    # Automatisch erstellte Versionen
+    video_1080p = models.FileField(upload_to='videos/1080p/', null=True, blank=True)
+    video_720p = models.FileField(upload_to='videos/720p/', null=True, blank=True)
+    video_480p = models.FileField(upload_to='videos/480p/', null=True, blank=True)
 
     def __str__(self):
         return self.title
