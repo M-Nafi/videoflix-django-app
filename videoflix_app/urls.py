@@ -16,6 +16,8 @@ urlpatterns = [
     #path('api/', redirect_to_schema, name='root'), only for production
     path('api/', redirect_to_admin, name='root'),
     #path('api/', include('user_auth_app.api.urls')), für mögliches Profile Edite
+    path('api/media/', include('media_content_app.api.urls')),
+    # path('api/user/', include('user_auth_app.api.urls')), für mögliches Profile Edite
     
     # Neuer CSRF-Endpoint
     path('api/auth/csrf/', get_csrf_token, name='get_csrf_token'),

@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'user_auth_app',
     'drf_spectacular',
+    'media_content_app',
 ]
 
 
