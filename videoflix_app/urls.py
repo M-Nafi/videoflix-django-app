@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.urls import path, re_path, include
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from user_auth_app.api.views import get_csrf_token
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
+import user_auth_app.api.urls as api_urls
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
@@ -13,12 +13,19 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #path('api/', redirect_to_schema, name='root'), only for production
     path('api/', redirect_to_admin, name='root'),
-    #path('api/', include('user_auth_app.api.urls')), für mögliches Profile Edite
     
-     # Djoser-Basis-Endpunkte
-    path('api/auth/', include('djoser.urls')),           # Registration, Activation, Reset :contentReference[oaicite:8]{index=8}
-    path('api/auth/', include('djoser.urls.jwt')),       # JWT Obtain/Refresh/Verify :contentReference[oaicite:9]{index=9}
-
+    # Djoser-Basis-Endpunkte:
+    # Registrierung, Aktivierung, Passwort-Reset
+    path('api/auth/', include('djoser.urls')),
+    
+    # Djoser-JWT-Endpunkte:
+    # Login (Token erstellen), Refresh, Verify
+    path('api/auth/', include('djoser.urls.jwt')),
+    
+    # Ihre zusätzlichen API-Routen:
+    # - Benutzerprofil (/users/profile/)
+    # - Logout (/jwt/logout/)
+    path('api/auth/', include(api_urls)),
     
     ## API Schema & Doku
     # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
