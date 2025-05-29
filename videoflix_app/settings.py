@@ -38,42 +38,81 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 AUTH_USER_MODEL = 'user_auth_app.User'
 SITE_ID = 1
 
+# ----------------------------------------
 # allauth-Konfiguration
+# ----------------------------------------
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*',]
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"# muss geändert werden in prod "https"
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Videoflix] "
+ACCOUNT_EMAIL_CONFIRMATION_ANON_REDIRECT_URL = 'https://frontend.example.com/email-confirmed'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'https://frontend.example.com/email-confirmed'
+ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = False
+ACCOUNT_PREVENT_ENUMERATION = True
 ACCOUNT_ADAPTER = "user_auth_app.adapter.HTMLOnlyAccountAdapter"
 
+
+LOGIN_URL = "/admin"
+
 # ----------------------------------------
-# dj-rest-auth JWT Settings
+# Email Backend & SMTP (Django)
 # ----------------------------------------
-REST_AUTH = {
-    'REGISTER_SERIALIZER': 'user_auth_app.api.serializers.CustomRegisterSerializer',
-    'USE_JWT': True,
-    'SESSION_LOGIN' : False,
-    'JWT_AUTH_COOKIE' : 'access_token',
-    'JWT_AUTH_REFRESH_COOKIE' : 'refresh_token',
-    'JWT_AUTH_COOKIE_USE_CSRF' : True,
-    'JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED' : True,
-    'JWT_AUTH_HTTPONLY' : True,
-    'JWT_AUTH_SECURE' : False,
-    'JWT_AUTH_SAMESITE' : 'Lax',
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+
+# ----------------------------------------
+# Djoser-Konfiguration
+# ----------------------------------------
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SET_PASSWORD_RETYPE': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SERIALIZERS': {
+        'user_create': 'user_auth_app.api.serializers.UserCreateSerializer',
+        'user': 'user_auth_app.api.serializers.UserSerializer',
+    },
 }
+
+# # ----------------------------------------
+# # dj-rest-auth JWT Settings
+# # ----------------------------------------
+# REST_AUTH = {
+#     'REGISTER_SERIALIZER': 'user_auth_app.api.serializers.CustomRegisterSerializer',
+#     'PASSWORD_RESET_SERIALIZER': 'user_auth_app.api.serializers.CustomPasswordResetSerializer',
+#     'USE_JWT': True,
+#     'SESSION_LOGIN' : False,
+#     'JWT_AUTH_COOKIE' : 'access_token',
+#     'JWT_AUTH_REFRESH_COOKIE' : 'refresh_token',
+#     'JWT_AUTH_COOKIE_USE_CSRF' : True,
+#     'JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED' : True,
+#     'JWT_AUTH_HTTPONLY' : True,
+#     'JWT_AUTH_SECURE' : False,
+#     'JWT_AUTH_SAMESITE' : 'Lax',
+# }
 
 
 # ----------------------------------------
 # Simple JWT Settings
 # ----------------------------------------
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),   # <-- kurzlebig :contentReference[oaicite:15]{index=15}
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # <-- längere Nutzungsdauer :contentReference[oaicite:16]{index=16}
-    'ROTATE_REFRESH_TOKENS': True,                   # <-- Token-Rotation :contentReference[oaicite:17]{index=17}
-    'BLACKLIST_AFTER_ROTATION': True,                # <-- Blacklist alter Tokens :contentReference[oaicite:18]{index=18}
-    'UPDATE_LAST_LOGIN': False,                      # optional
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_COOKIE': 'access_token',
+    'AUTH_COOKIE_SAMESITE': 'Lax',
+    'AUTH_COOKIE_SECURE': not DEBUG,
 }
 
 # Application definition
@@ -86,15 +125,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'corsheaders',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'djoser',
     'user_auth_app',
     'drf_spectacular',
 ]
@@ -235,14 +270,6 @@ REST_FRAMEWORK = {
     #'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-LOGIN_URL = "/admin"
-
-# Django SMTP
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 
 # SPECTACULAR_SETTINGS = {
 #     'TITLE': 'Videoflix API',
