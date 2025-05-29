@@ -8,6 +8,8 @@ defusedxml==0.7.1
 Django==5.1.7
 django-cors-headers==4.7.0
 django-filter==25.1
+django-render-block==0.11
+django-templated-email==3.0.1
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
 djoser==2.3.1

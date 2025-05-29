@@ -70,6 +70,10 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 # Djoser-Konfiguration
 # ----------------------------------------
 DJOSER = {
+    'EMAIL': {
+        'activation': 'user_auth_app.api.emails.CustomActivationEmail',
+        'password_reset': 'user_auth_app.api.emails.CustomPasswordResetEmail',
+    },
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
@@ -244,8 +248,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'user_auth_app.api.authentication.CookieJWTAuthentication',
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [

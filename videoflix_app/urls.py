@@ -15,15 +15,10 @@ urlpatterns = [
     path('api/', redirect_to_admin, name='root'),
     #path('api/', include('user_auth_app.api.urls')), für mögliches Profile Edite
     
-    # Neuer CSRF-Endpoint
-    path('api/auth/csrf/', get_csrf_token, name='get_csrf_token'),
-    
-    # Optional: Alias für dj-rest-auth VerifyEmailView
-    # path(
-    #     'api/auth/account-confirm-email/',
-    #     VerifyEmailView.as_view(),
-    #     name='account_email_verification_sent'
-    # ),
+     # Djoser-Basis-Endpunkte
+    path('api/auth/', include('djoser.urls')),           # Registration, Activation, Reset :contentReference[oaicite:8]{index=8}
+    path('api/auth/', include('djoser.urls.jwt')),       # JWT Obtain/Refresh/Verify :contentReference[oaicite:9]{index=9}
+
     
     ## API Schema & Doku
     # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
