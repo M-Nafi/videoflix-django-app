@@ -4,10 +4,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
 import user_auth_app.api.urls as api_urls
+import user_auth_app.api.views as custom_views
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     # path('', redirect_to_schema, name='root'), only for production
+    path(
+        "activate/<str:uid>/<str:token>/",
+        custom_views.FrontendActivationView.as_view(),
+        name="frontend-activate",
+    ),
     
     path('', redirect_to_admin, name='root'),
     path('admin/', admin.site.urls),

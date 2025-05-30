@@ -3,9 +3,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class CookieJWTAuthentication(JWTAuthentication):
     """
-    Read JWT from HttpOnly cookie instead of Authorization header.
+    Liest das Access-Token aus dem HttpOnly-Cookie (fallback auf Header).
     """
-    def get_raw_token(self, header):
-        request = self.request
-        token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE'])
-        return token or super().get_raw_token(header)
+    def authenticate(self, request):
+        raw_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE'])
+        if raw_token is None:
+            return super().authenticate(request)
+
+        validated_token = self.get_validated_token(raw_token)
+        user = self.get_user(validated_token)
+        return (user, validated_token)

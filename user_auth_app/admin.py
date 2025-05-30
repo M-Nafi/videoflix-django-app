@@ -1,44 +1,27 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.utils.translation import gettext_lazy as _
+from .models import User
 
-User = get_user_model()
-
-class CustomUserAdmin(BaseUserAdmin):
-    """
-    Custom Admin for the CustomUser model (AUTH_USER_MODEL),
-    shows e-mail instead of user name and important data.
-    """
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
     model = User
 
-    list_display = ('id', 'email', 'is_staff', 'is_active')
-    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    # Zeige im Listen-View E-Mail, Aktiviert-Status, An‐/Abmelde-Zeit
+    list_display = ('email','is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login')
+    list_filter  = ('is_active',)
 
-    search_fields = ('email',)
-    ordering = ('id',)
-
-    readonly_fields = ('id', 'date_joined', 'last_login')
-
+    # Da wir username nicht mehr nutzen, reduzieren wir die Felder
     fieldsets = (
-        (None, {
-            'fields': ('id', 'email', 'password'),
-            'description': _('Verwende das E-Mail-Feld als Login-Identifier.')
-        }),
-        (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
-        }),
-        (_('Important dates'), {
-            'fields': ('last_login', 'date_joined')
-        }),
+        (None, {'fields': ('email', 'password')}),
+        ('Permissions', {'fields': ('is_active','is_staff','is_superuser')}),
+        ('Important dates', {'fields': ('last_login','date_joined')}),
     )
-
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_active', 'is_staff', 'is_superuser'),
+            'fields': ('email','password1','password2','is_active','is_staff','is_superuser'),
         }),
     )
-    
-admin.site.register(User, CustomUserAdmin)
 
+    ordering = ('email',)
+    search_fields = ('email',)
