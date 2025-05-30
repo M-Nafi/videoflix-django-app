@@ -6,10 +6,9 @@ from djoser import email as djoser_email
 
 class CustomActivationEmail(djoser_email.ActivationEmail):
     """
-    Djoser ActivationEmail mit Inline-PNG-Logo über templated_email.
+    Send activation email with inline logo.
     """
-    def send(self, to, context):
-        # 1) Logo laden (falls vorhanden)
+    def send(self, to):
         logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo.png')
         try:
             with open(logo_path, 'rb') as png_file:
@@ -21,22 +20,19 @@ class CustomActivationEmail(djoser_email.ActivationEmail):
         except FileNotFoundError:
             logo = None
 
-        # 2) E-Mail versenden
         send_templated_mail(
-            template_name='email/activation',    # lädt activation.txt & activation.html
+            template_name='email/activation',
             from_email=self.from_email,
-            recipient_list=[to],
-            context=context,
+            recipient_list=to,
+            context=self.context,
             attachments=[logo] if logo else None
         )
 
-
 class CustomPasswordResetEmail(djoser_email.PasswordResetEmail):
     """
-    Djoser PasswordResetEmail mit Inline-PNG-Logo über templated_email.
+    Send password-reset email with inline logo.
     """
-    def send(self, to, context):
-        # 1) Logo laden
+    def send(self, to):
         logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo.png')
         try:
             with open(logo_path, 'rb') as png_file:
@@ -48,11 +44,10 @@ class CustomPasswordResetEmail(djoser_email.PasswordResetEmail):
         except FileNotFoundError:
             logo = None
 
-        # 2) E-Mail versenden
         send_templated_mail(
-            template_name='email/password_reset',  # lädt password_reset.txt & password_reset.html
+            template_name='email/password_reset',
             from_email=self.from_email,
-            recipient_list=[to],
-            context=context,
+            recipient_list=to,
+            context=self.context,
             attachments=[logo] if logo else None
         )

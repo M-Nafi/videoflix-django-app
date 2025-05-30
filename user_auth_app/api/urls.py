@@ -1,15 +1,21 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserProfileViewSet, LogoutView
+from .views import (
+    UserProfileViewSet,
+    CookieTokenObtainPairView,
+    CookieTokenRefreshView,
+    TokenVerifyView,
+    LogoutView,
+)
 
 router = DefaultRouter()
-# URL /api/auth/users/me/ für GET, PUT/PATCH, DELETE
-router.register(r'users/profile', UserProfileViewSet, basename='user-profile')
+router.register(r'users/me', UserProfileViewSet, basename='user-profile')
 
 urlpatterns = [
-    # Router-URLs: users/profile/
     path('', include(router.urls)),
-    # Optional: Logout löscht das JWT-Cookie
+    path('jwt/create/', CookieTokenObtainPairView.as_view(), name='jwt_create'),
+    path('jwt/refresh/', CookieTokenRefreshView.as_view(), name='jwt_refresh'),
+    path('jwt/verify/', TokenVerifyView.as_view(), name='jwt_verify'),
     path('jwt/logout/', LogoutView.as_view(), name='jwt_logout'),
 ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
@@ -14,17 +14,10 @@ urlpatterns = [
     #path('api/', redirect_to_schema, name='root'), only for production
     path('api/', redirect_to_admin, name='root'),
     
-    # Djoser-Basis-Endpunkte:
-    # Registrierung, Aktivierung, Passwort-Reset
-    path('api/auth/', include('djoser.urls')),
+    # Djoser: registration, activation, password reset
+    re_path(r'^auth/', include('djoser.urls')),
     
-    # Djoser-JWT-Endpunkte:
-    # Login (Token erstellen), Refresh, Verify
-    path('api/auth/', include('djoser.urls.jwt')),
-    
-    # Ihre zusätzlichen API-Routen:
-    # - Benutzerprofil (/users/profile/)
-    # - Logout (/jwt/logout/)
+    # unsere JWT-Endpoints & Profil
     path('api/auth/', include(api_urls)),
     
     ## API Schema & Doku
