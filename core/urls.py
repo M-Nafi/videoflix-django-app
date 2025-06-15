@@ -5,6 +5,8 @@ from django.conf.urls.static import static
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
 import user_auth_app.api.urls as api_urls
 import user_auth_app.api.views as custom_views
+import media_content_app.api.urls as media_urls
+
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
@@ -25,6 +27,7 @@ urlpatterns = [
     
     # unsere JWT-Endpoints & Profil
     path('api/auth/', include(api_urls)),
+    path('api/media/', include(media_urls)),
     
     ## API Schema & Doku
     # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
