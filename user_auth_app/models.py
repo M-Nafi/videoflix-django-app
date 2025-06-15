@@ -28,9 +28,17 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractUser):
     """
-    Custom user model that replaces the default username field with an email address.
+    Custom user model that replaces the default username field with an email address,
+    but reintroduces username as an optional field so scripts/tools expecting it still work.
     """
-    username = None
+    username = models.CharField(
+        'username',
+        max_length=150,
+        unique=True,
+        blank=True,
+        null=True
+    )
+
     email = models.EmailField('E-Mail', unique=True)
 
     USERNAME_FIELD = 'email'
