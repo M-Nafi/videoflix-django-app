@@ -35,6 +35,8 @@ AUTH_USER_MODEL = 'user_auth_app.User'
 SITE_ID = 1
 
 LOGIN_URL = "/admin"#muss auf die Fronend seite geändert werden
+# Frontend URLs
+FRONTEND_LOGIN_URL = 'http://localhost:4200/login'
 
 # ----------------------------------------
 # Email Backend & SMTP (Django)

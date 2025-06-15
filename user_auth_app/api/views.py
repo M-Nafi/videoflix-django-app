@@ -30,7 +30,7 @@ class FrontendActivationView(APIView):
         if default_token_generator.check_token(user, token):
             user.is_active = True
             user.save(update_fields=["is_active"])
-        return redirect("admin:index")
+        return redirect(settings.FRONTEND_LOGIN_URL)
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
