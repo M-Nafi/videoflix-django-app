@@ -6,4 +6,4 @@ class MediaContentAppConfig(AppConfig):
     name = 'media_content_app'
 
     def ready(self):
-        import media_content_app.signals
+        import __media_content_app.signals

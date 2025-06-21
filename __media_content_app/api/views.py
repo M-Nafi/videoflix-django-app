@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions
-from media_content_app.models import Video
+from __media_content_app.models import Video
 from .serializers import VideoSerializer
 
 class VideoViewSet(viewsets.ModelViewSet):

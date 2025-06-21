@@ -108,7 +108,6 @@ INSTALLED_APPS = [
     'djoser',
     'user_auth_app',
     'drf_spectacular',
-    'media_content_app',
 ]
 
 

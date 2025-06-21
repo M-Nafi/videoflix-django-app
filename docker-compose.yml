@@ -8,6 +8,12 @@ services:
             POSTGRES_PASSWORD: ${DB_PASSWORD}
         volumes:
             - postgres_data:/var/lib/postgresql/data
+        # Füge einen Healthcheck hinzu, damit der Web-Service wirklich erst startet, wenn die DB bereit ist
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     redis:
         image: redis:latest
@@ -22,18 +28,38 @@ services:
         env_file: .env
         container_name: videoflix_backend
 
+        # NEU: Überschreibt den ENTRYPOINT aus dem Dockerfile.
+        # Dies ist der empfohlene Weg für die Entwicklung.
+        command: >
+            sh -c "
+              echo 'Warten auf die Datenbank...'
+              # Die Logik zum Warten auf die DB (aus dem alten Entrypoint)
+              # ist jetzt durch den Healthcheck im DB-Service und depends_on.condition abgedeckt.
+              
+              echo 'Datenbank-Migrationen werden ausgeführt...'
+              python manage.py migrate
+
+              echo 'Starte den Entwicklungsserver mit Live-Reload...'
+              python manage.py runserver 0.0.0.0:8000
+            "
+
         volumes:
+            # Dies ist der wichtigste Teil für Live-Reload:
+            # Dein lokaler Code-Ordner wird in den Container gespiegelt.
             - .:/app
             - videoflix_media:/app/media
             - videoflix_static:/app/static
         ports:
             - "8000:8000"
         depends_on:
-            - db
-            - redis
+            db:
+                # Wartet, bis die Datenbank den Healthcheck besteht
+                condition: service_healthy
+            redis:
+                condition: service_started
 
 volumes:
-    postgres_data:
-    redis_data:
-    videoflix_media:
-    videoflix_static:
+    postgres_data: null
+    redis_data: null
+    videoflix_media: null
+    videoflix_static: null

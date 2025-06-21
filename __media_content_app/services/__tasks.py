@@ -2,8 +2,8 @@ import os
 import subprocess
 from django.core.files import File
 from django.conf import settings
-from celery import shared_task
-from media_content_app.models import Video
+#from celery import shared_task
+from __media_content_app.models import Video
 
 
 
