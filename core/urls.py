@@ -10,22 +10,20 @@ import user_auth_app.api.views as custom_views
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
-    # path('', redirect_to_schema, name='root'), only for production
-    path(
-        "activate/<str:uid>/<str:token>/",
-        custom_views.FrontendActivationView.as_view(),
-        name="frontend-activate",
-    ),
+    #only for production
+    #path('', redirect_to_schema, name='root'),
+    #path('api/', redirect_to_schema, name='root'),
     
+    #dev settings
     path('', redirect_to_admin, name='root'),
-    path('admin/', admin.site.urls),
-    #path('api/', redirect_to_schema, name='root'), only for production
     path('api/', redirect_to_admin, name='root'),
+    path('admin/', admin.site.urls),
     
-    # Djoser: registration, activation, password reset
+    # Djoser: registration, activation, password reset, JWT-Auth
     re_path(r'^auth/', include('djoser.urls')),
+    re_path(r'^auth/jwt/', include('djoser.urls.jwt')),
     
-    # unsere JWT-Endpoints & Profil
+    # User-Profil
     path('api/auth/', include(api_urls)),
     #path('api/media/', include(media_urls)),
     

@@ -59,14 +59,12 @@ DJOSER = {
     },
     'SEND_ACTIVATION_EMAIL': True,
     'SEND_CONFIRMATION_EMAIL': True,
-    #'ACTIVATION_URL': 'auth/users/activate/{uid}/{token}',
-    #'PASSWORD_RESET_CONFIRM_URL': 'auth/users/password/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': 'activate/{uid}/{token}/',
-    'PASSWORD_RESET_CONFIRM_URL': 'activate/{uid}/{token}/',
-    'EMAIL_FRONTEND_DOMAIN': '127.0.0.1:8000',
+    'ACTIVATION_URL': 'http://localhost:4200/activate/{uid}/{token}/',    # Frontend-Route :contentReference[oaicite:12]{index=12}
+    'PASSWORD_RESET_CONFIRM_URL': 'http://localhost:4200/password-reset/{uid}/{token}/',
+    'EMAIL_FRONTEND_DOMAIN': 'localhost:4200',                            # für E-Mail-Templates :contentReference[oaicite:13]{index=13}
     'EMAIL_FRONTEND_PROTOCOL': 'http',
     'EMAIL_FRONTEND_SITE_NAME': 'Videoflix',
-    'LOGIN_FIELD': 'email',
+    'LOGIN_FIELD': 'email',                                              # Login per E-Mail :contentReference[oaicite:14]{index=14}
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
@@ -245,7 +243,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'user_auth_app.api.authentication.CookieJWTAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     
@@ -280,8 +277,8 @@ REST_FRAMEWORK = {
 # }
 
 # Celery Einstellungen
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
 
