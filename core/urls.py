@@ -4,7 +4,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
 import user_auth_app.api.urls as api_urls
-import user_auth_app.api.views as custom_views
+from user_auth_app.api.views import CookieTokenObtainPairView, CookieTokenRefreshView
+
+
+
 #import __media_content_app.api.urls as media_urls
 
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -13,6 +16,9 @@ urlpatterns = [
     #only for production
     #path('', redirect_to_schema, name='root'),
     #path('api/', redirect_to_schema, name='root'),
+    #simple-jwt
+    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     
     #dev settings
     path('', redirect_to_admin, name='root'),
@@ -22,6 +28,7 @@ urlpatterns = [
     # Djoser: registration, activation, password reset, JWT-Auth
     re_path(r'^auth/', include('djoser.urls')),
     re_path(r'^auth/jwt/', include('djoser.urls.jwt')),
+    
     
     # User-Profil
     path('api/auth/', include(api_urls)),

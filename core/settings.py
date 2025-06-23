@@ -79,9 +79,10 @@ DJOSER = {
 # ----------------------------------------
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_HEADER_TYPES': ('JWT',),
     'AUTH_COOKIE': 'access_token',               # changed: cookie name for access
     'AUTH_COOKIE_REFRESH': 'refresh_token',      # added: cookie name for refresh
