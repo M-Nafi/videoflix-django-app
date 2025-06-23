@@ -16,9 +16,6 @@ urlpatterns = [
     #only for production
     #path('', redirect_to_schema, name='root'),
     #path('api/', redirect_to_schema, name='root'),
-    #simple-jwt
-    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     
     #dev settings
     path('', redirect_to_admin, name='root'),
@@ -29,6 +26,9 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls')),
     re_path(r'^auth/jwt/', include('djoser.urls.jwt')),
     
+    #simple-jwt with httpOnlyCookie
+    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     
     # User-Profil
     path('api/auth/', include(api_urls)),
