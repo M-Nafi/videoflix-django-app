@@ -1,6 +1,8 @@
-from requests import Response
+from urllib import response
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import get_user_model
 from core import settings
 from .serializers import UserSerializer
@@ -22,30 +24,34 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
-        response =  super(request, *args, **kwargs)
-        refresh = response.data.get('refresh')
-        access = response.data.get('access')
+        try:
+            
+            response =  super().post(request, *args, **kwargs)
+            refresh = response.data.get('refresh')
+            access = response.data.get('access')
+            
+            response.set_cookie(
+                key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                value = access,
+                expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            )
+            
+            response.set_cookie(
+                key = settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
+                value = refresh,
+                expires = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
+                secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            )
         
-        response.set_cookie(
-            key = settings.SIMPLE_JWT['AUTH_COOKIE'],
-            value = access,
-            expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-            secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
-        
-        response.set_cookie(
-            key = settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
-            value = refresh,
-            expires = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
-            secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
-        
-        response.data = {'message': 'Login erfolgreich'}
-        return response
+            response.data = {'message': 'Login successful'}
+            return response
+        except:
+            return Response({'message': 'Login not successful'})
         
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
@@ -78,3 +84,17 @@ class CookieTokenRefreshView(TokenRefreshView):
         )
         
         return response
+    
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, format=None):
+        try:
+            response = Response()
+            response.delete_cookie('access_token', path='/', samesite="None")
+            response.delete_cookie('refresh_token', path='/', samesite="None")
+            response.data = {'message': 'Logout successful'}
+            return response
+        except:
+            return Response(
+                {'detail': 'Logout fails!'},
+            )        

@@ -3,8 +3,8 @@ from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
+from user_auth_app.api.views import CookieTokenObtainPairView, CookieTokenRefreshView, LogoutView
 import user_auth_app.api.urls as api_urls
-from user_auth_app.api.views import CookieTokenObtainPairView, CookieTokenRefreshView
 
 
 
@@ -23,15 +23,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Djoser: registration, activation, password reset, JWT-Auth
-    re_path(r'^auth/', include('djoser.urls')),
-    re_path(r'^auth/jwt/', include('djoser.urls.jwt')),
+    re_path(r'^api/', include('djoser.urls')),
+    re_path(r'^api/', include('djoser.urls.jwt')),
     
-    #simple-jwt with httpOnlyCookie
-    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
+    #simple-jwt with httpOnlyCookie and Logout
+    path('api/login/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/login/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
+    path('api/logout/', LogoutView.as_view(), name='token_logout'),
     
     # User-Profil
-    path('api/auth/', include(api_urls)),
+    path('api/', include(api_urls)),
     #path('api/media/', include(media_urls)),
     
     ## API Schema & Doku
