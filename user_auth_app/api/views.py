@@ -2,11 +2,11 @@ from urllib import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from core import settings
 from .serializers import UserSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 User = get_user_model()
 
@@ -23,6 +23,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return User.objects.filter(id=self.request.user.id)
     
 class CookieTokenObtainPairView(TokenObtainPairView):
+    """
+    Handle user login by issuing JWT tokens in secure HTTP-only cookies.
+    """
     def post(self, request, *args, **kwargs):
         try:
             
@@ -54,6 +57,9 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             return Response({'message': 'Login not successful'})
         
 class CookieTokenRefreshView(TokenRefreshView):
+    """
+    Refresh the JWT access token using the refresh token from cookies.
+    """
     def post(self, request, *args, **kwargs):
         refresh_token =  request.COOKIES.get("refresh_token")
         
@@ -85,8 +91,34 @@ class CookieTokenRefreshView(TokenRefreshView):
         
         return response
     
+class CookieTokenVerifyView(TokenVerifyView):
+    """
+    Verify the JWT stored in HTTP-only cookies without returning token data.
+    """
+    def post(self, request, *args, **kwargs):
+        access_token =  request.COOKIES.get("access_token")
+        
+        if access_token is None:
+            return Response(
+                {"detail" : "Access token not found!"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serialize = self.get_serializer(data={"access" : access_token})
+        
+        try: 
+            serialize.is_valid(raise_exception=True)
+            return Response({'message': 'Access Token is valid'})
+        except:
+            return Response(
+                {"detail" : "Access token invalid!"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+            
+    
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    """
+    Log out the user by clearing JWT cookies.
+    """
     def post(self, request, format=None):
         try:
             response = Response()
