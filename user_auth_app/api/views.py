@@ -1,12 +1,18 @@
-from urllib import response
+from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import get_user_model
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+from rest_framework.test import APIRequestFactory
+from djoser.views import UserViewSet
 from core import settings
 from .serializers import UserSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 User = get_user_model()
 
@@ -129,4 +135,28 @@ class LogoutView(APIView):
         except:
             return Response(
                 {'detail': 'Logout fails!'},
-            )        
+            )
+
+class ActivationRedirectView(APIView):
+    """
+    Accepts GET /activate/<uid>/<token>/, internally invokes
+    the Djoser activation action (which expects POST),
+    then redirects to the frontend login page.
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, uid, token):
+        factory = APIRequestFactory()
+        data = {'uid': uid, 'token': token}
+        post_req = factory.post(
+            '/users/activation/', data, format='json',
+            HTTP_HOST=request.get_host()
+        )
+        view = UserViewSet.as_view({'post': 'activation'})
+        response = view(post_req)
+
+        if response.status_code == status.HTTP_204_NO_CONTENT:
+            return redirect(settings.FRONTEND_LOGIN_URL)
+        return redirect(f"{settings.FRONTEND_LOGIN_URL}?activation_failed=1")
+

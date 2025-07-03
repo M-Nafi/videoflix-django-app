@@ -1,47 +1,45 @@
 import os
 from django.conf import settings
-from djoser.email import ActivationEmail as DjoserActivationEmail, PasswordResetEmail as DjoserPasswordResetEmail
+from django.contrib.staticfiles import finders
+from djoser.email import ActivationEmail, PasswordResetEmail
 from email.mime.image import MIMEImage
 
-class CustomActivationEmail(DjoserActivationEmail):
+class CustomActivationEmail(ActivationEmail):
     """
-    Send activation email with inline logo and correct backend URL.
+    Send activation email with inline logo using Django staticfiles finder.
     """
     def send(self, to, fail_silently=False, **kwargs):
-        # 1) Template rendern (füllt subject, body und html_body)
         self.render()
 
-        # 2) Logo einlesen und als Inline-MIMEImage anhängen
-        logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo.png')
-        try:
-            with open(logo_path, 'rb') as f:
-                img_data = f.read()
-            img = MIMEImage(img_data)
+        # Logo über den Staticfiles‐Finder ermitteln
+        logo_path = finders.find('logo.png')
+        if not logo_path:
+            # Fallback: stilles Scheitern oder eigene Logik
+            return super().send(to=to, fail_silently=fail_silently, **kwargs)
+
+        with open(logo_path, 'rb') as f:
+            img = MIMEImage(f.read())
             img.add_header('Content-ID', '<videoflix_logo>')
             img.add_header('Content-Disposition', 'inline; filename="logo.png"')
             self.attach(img)
-        except FileNotFoundError:
-            pass
 
-        # 3) Absenden
         super().send(to=to, fail_silently=fail_silently, **kwargs)
 
-class CustomPasswordResetEmail(DjoserPasswordResetEmail):
+class CustomPasswordResetEmail(PasswordResetEmail):
     """
-    Send password-reset email with inline logo and correct backend URL.
+    Send password-reset email with inline logo using Django staticfiles finder.
     """
     def send(self, to, fail_silently=False, **kwargs):
         self.render()
 
-        logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo.png')
-        try:
-            with open(logo_path, 'rb') as f:
-                img_data = f.read()
-            img = MIMEImage(img_data)
+        logo_path = finders.find('logo.png')
+        if not logo_path:
+            return super().send(to=to, fail_silently=fail_silently, **kwargs)
+
+        with open(logo_path, 'rb') as f:
+            img = MIMEImage(f.read())
             img.add_header('Content-ID', '<videoflix_logo>')
             img.add_header('Content-Disposition', 'inline; filename="logo.png"')
             self.attach(img)
-        except FileNotFoundError:
-            pass
 
         super().send(to=to, fail_silently=fail_silently, **kwargs)

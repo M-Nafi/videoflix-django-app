@@ -3,7 +3,7 @@ from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from user_auth_app.views import redirect_to_admin #redirect_to_schema
-from user_auth_app.api.views import CookieTokenObtainPairView, CookieTokenRefreshView, CookieTokenVerifyView, LogoutView
+from user_auth_app.api.views import CookieTokenObtainPairView, CookieTokenRefreshView, CookieTokenVerifyView, LogoutView, ActivationRedirectView
 import user_auth_app.api.urls as api_urls
 
 
@@ -17,10 +17,17 @@ urlpatterns = [
     #path('', redirect_to_schema, name='root'),
     #path('api/', redirect_to_schema, name='root'),
     
+    path(
+        'activate/<uid>/<token>/',
+        ActivationRedirectView.as_view(),
+        name='activation-redirect'
+    ),
+    
     #dev settings
     path('', redirect_to_admin, name='root'),
     path('api/', redirect_to_admin, name='root'),
     path('admin/', admin.site.urls),
+    path('', include('templated_email.urls', namespace='templated_email')),
     
     # Djoser: registration, activation, password reset, JWT-Auth
     re_path(r'^api/', include('djoser.urls')),

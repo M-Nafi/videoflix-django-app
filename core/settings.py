@@ -59,12 +59,12 @@ DJOSER = {
     },
     'SEND_ACTIVATION_EMAIL': True,
     'SEND_CONFIRMATION_EMAIL': True,
-    'ACTIVATION_URL': 'http://localhost:4200/activate/{uid}/{token}/',    # Frontend-Route :contentReference[oaicite:12]{index=12}
+    'ACTIVATION_URL': 'http://localhost:8000/activate/{uid}/{token}/',
     'PASSWORD_RESET_CONFIRM_URL': 'http://localhost:4200/password-reset/{uid}/{token}/',
-    'EMAIL_FRONTEND_DOMAIN': 'localhost:4200',                            # für E-Mail-Templates :contentReference[oaicite:13]{index=13}
+    'EMAIL_FRONTEND_DOMAIN': 'localhost:8000',
     'EMAIL_FRONTEND_PROTOCOL': 'http',
     'EMAIL_FRONTEND_SITE_NAME': 'Videoflix',
-    'LOGIN_FIELD': 'email',                                              # Login per E-Mail :contentReference[oaicite:14]{index=14}
+    'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'templated_email',
     'djoser',
     'user_auth_app',
     'drf_spectacular',
