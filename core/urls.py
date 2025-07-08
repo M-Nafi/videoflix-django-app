@@ -27,7 +27,7 @@ urlpatterns = [
     path('', redirect_to_admin, name='root'),
     path('api/', redirect_to_admin, name='root'),
     path('admin/', admin.site.urls),
-    path('', include('templated_email.urls', namespace='templated_email')),
+    path('django-rq/', include('django_rq.urls')),
     
     # Djoser: registration, activation, password reset, JWT-Auth
     re_path(r'^api/', include('djoser.urls')),
@@ -38,6 +38,8 @@ urlpatterns = [
     path('api/login/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('api/login/verify/', CookieTokenVerifyView.as_view(), name='token_verify'),
     path('api/logout/', LogoutView.as_view(), name='token_logout'),
+    path('api/video/', include('videoflix.api.urls')),
+    path('api/videoflix/', include('videoflix.api.urls')),
     
     # User-Profil
     path('api/', include(api_urls)),

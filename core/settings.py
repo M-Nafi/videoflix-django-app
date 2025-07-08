@@ -104,9 +104,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'templated_email',
     'djoser',
     'user_auth_app',
+    'videoflix.apps.VideoflixConfig',
     'drf_spectacular',
 ]
 
