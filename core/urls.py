@@ -38,8 +38,8 @@ urlpatterns = [
     path('api/login/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('api/login/verify/', CookieTokenVerifyView.as_view(), name='token_verify'),
     path('api/logout/', LogoutView.as_view(), name='token_logout'),
-    path('api/video/', include('videoflix.api.urls')),
-    path('api/videoflix/', include('videoflix.api.urls')),
+    path('api/', include('video.api.urls')),
+   
     
     # User-Profil
     path('api/', include(api_urls)),

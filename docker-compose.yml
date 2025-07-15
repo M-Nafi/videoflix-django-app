@@ -37,7 +37,12 @@ services:
               # ist jetzt durch den Healthcheck im DB-Service und depends_on.condition abgedeckt.
               
               echo 'Datenbank-Migrationen werden ausgeführt...'
+              python manage.py collectstatic --noinput
+              python manage.py makemigrations
               python manage.py migrate
+              
+              echo 'Starte RQ Worker im Hintergrund...'
+              python manage.py rqworker default &
 
               echo 'Starte den Entwicklungsserver mit Live-Reload...'
               python manage.py runserver 0.0.0.0:8000

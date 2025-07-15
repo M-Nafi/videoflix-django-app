@@ -106,7 +106,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'djoser',
     'user_auth_app',
-    'videoflix.apps.VideoflixConfig',
+    'video.apps.VideoConfig',
     'drf_spectacular',
 ]
 

@@ -1,0 +1,98 @@
+import os
+from django.conf import settings
+from video.models import Video
+from django_rq import job
+
+from .functions import convert_video, convert_video_to_hls, generate_thumbnail
+
+
+@job
+def process_video(video_id):
+    """
+    Background job to process an uploaded video by converting it to multiple resolutions,
+    generating HLS streams, and creating a thumbnail image.
+
+    Args:
+        video_id (int): The primary key of the Video instance to process.
+
+    Process:
+        - Retrieves the Video object by ID.
+        - Extracts the original video file path and base filename.
+        - Converts the video into multiple standard resolutions (180p, 360p, 720p, 1080p).
+        - Creates HLS streams for each resolution with adaptive segments.
+        - Generates a thumbnail image from the original video.
+        - Updates the Video model instance with all file paths.
+        - Saves the updated Video instance.
+    """
+    video = Video.objects.get(id=video_id)
+    input_path = video.original_file.path
+    base_filename = os.path.splitext(os.path.basename(input_path))[0]
+    media_root = settings.MEDIA_ROOT
+
+    # Erstelle standard Video-Konvertierungen 
+    _convert_standard_resolutions(video, input_path, base_filename, media_root)
+    
+    # Erstelle HLS-Streams
+    _convert_hls_streams(video, input_path, base_filename, media_root)
+    
+    # Erstelle Thumbnail
+    _generate_video_thumbnail(video, input_path, base_filename, media_root)
+    
+    video.save()
+
+
+def _convert_standard_resolutions(video, input_path: str, base_filename: str, media_root: str):
+    """
+    Convert video to standard resolutions (180p, 360p, 720p, 1080p).
+    
+    Args:
+        video: Video model instance to update.
+        input_path (str): Path to the original video file.
+        base_filename (str): Base filename without extension.
+        media_root (str): Media root directory path.
+    """
+    resolutions = [180, 360, 720, 1080]
+    for res in resolutions:
+        output_path = os.path.join(
+            media_root, f'videos/{res}p/{base_filename}_{res}p.mp4')
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        convert_video(input_path, output_path, res)
+        setattr(video, f'video_{res}p',
+                f'videos/{res}p/{base_filename}_{res}p.mp4')
+
+
+def _convert_hls_streams(video, input_path: str, base_filename: str, media_root: str):
+    """
+    Convert video to HLS streams for adaptive streaming.
+    
+    Args:
+        video: Video model instance to update.
+        input_path (str): Path to the original video file.
+        base_filename (str): Base filename without extension.
+        media_root (str): Media root directory path.
+    """
+    resolutions = [180, 360, 720, 1080]
+    for res in resolutions:
+        hls_dir = os.path.join(media_root, f'videos/hls/{res}p/{base_filename}')
+        os.makedirs(hls_dir, exist_ok=True)
+        
+        manifest_path = convert_video_to_hls(input_path, hls_dir, res)
+        relative_manifest_path = os.path.relpath(manifest_path, media_root)
+        setattr(video, f'hls_{res}p_manifest', relative_manifest_path)
+
+
+def _generate_video_thumbnail(video, input_path: str, base_filename: str, media_root: str):
+    """
+    Generate thumbnail image for the video.
+    
+    Args:
+        video: Video model instance to update.
+        input_path (str): Path to the original video file.
+        base_filename (str): Base filename without extension.
+        media_root (str): Media root directory path.
+    """
+    thumbnail_path = os.path.join(
+        media_root, f'videos/thumbnails/{base_filename}.jpg')
+    os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)
+    generate_thumbnail(input_path, thumbnail_path)
+    video.thumbnail = f'videos/thumbnails/{base_filename}.jpg'
