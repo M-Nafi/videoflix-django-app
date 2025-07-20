@@ -1,9 +1,9 @@
 import os
 from django.conf import settings
-from video.models import Video
+from content.models import Video
 from django_rq import job
 
-from .functions import convert_video, convert_video_to_hls, generate_thumbnail
+from .utils import convert_video, convert_video_to_hls, generate_thumbnail
 
 
 @job
@@ -24,18 +24,23 @@ def process_video(video_id):
         - Updates the Video model instance with all file paths.
         - Saves the updated Video instance.
     """
-    video = Video.objects.get(id=video_id)
+    try:
+        video = Video.objects.get(id=video_id)
+    except Video.DoesNotExist:
+        print(f"ERROR: Video with ID {video_id} does not exist. Task aborted.")
+        return
+    
+    if not video.original_file:
+        print(f"ERROR: Video {video_id} has no original_file. Task aborted.")
+        return
     input_path = video.original_file.path
     base_filename = os.path.splitext(os.path.basename(input_path))[0]
     media_root = settings.MEDIA_ROOT
 
-    # Erstelle standard Video-Konvertierungen 
-    _convert_standard_resolutions(video, input_path, base_filename, media_root)
+    # _convert_standard_resolutions(video, input_path, base_filename, media_root)
     
-    # Erstelle HLS-Streams
     _convert_hls_streams(video, input_path, base_filename, media_root)
     
-    # Erstelle Thumbnail
     _generate_video_thumbnail(video, input_path, base_filename, media_root)
     
     video.save()

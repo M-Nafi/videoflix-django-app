@@ -2,13 +2,12 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from user_auth_app.views import redirect_to_admin #redirect_to_schema
-from user_auth_app.api.views import CookieTokenObtainPairView, CookieTokenRefreshView, CookieTokenVerifyView, LogoutView, ActivationRedirectView
+from user_auth_app.views import redirect_to_admin
+from user_auth_app.api.views import (
+    RegisterView, ActivateView, LoginView, LogoutView,
+    TokenRefreshView, PasswordResetView, PasswordConfirmView
+)
 import user_auth_app.api.urls as api_urls
-
-
-
-#import __media_content_app.api.urls as media_urls
 
 #from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -17,33 +16,25 @@ urlpatterns = [
     #path('', redirect_to_schema, name='root'),
     #path('api/', redirect_to_schema, name='root'),
     
-    path(
-        'activate/<uid>/<token>/',
-        ActivationRedirectView.as_view(),
-        name='activation-redirect'
-    ),
-    
     #dev settings
     path('', redirect_to_admin, name='root'),
     path('api/', redirect_to_admin, name='root'),
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
     
-    # Djoser: registration, activation, password reset, JWT-Auth
-    re_path(r'^api/', include('djoser.urls')),
-    #re_path(r'^api/', include('djoser.urls.jwt')),
-    
-    #simple-jwt with httpOnlyCookie and Logout
-    path('api/login/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/login/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
-    path('api/login/verify/', CookieTokenVerifyView.as_view(), name='token_verify'),
-    path('api/logout/', LogoutView.as_view(), name='token_logout'),
-    path('api/', include('video.api.urls')),
+    # Custom Auth Endpoints (matching specification)
+    path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/activate/<uidb64>/<token>/', ActivateView.as_view(), name='activate'),
+    path('api/login/', LoginView.as_view(), name='login'),
+    path('api/logout/', LogoutView.as_view(), name='logout'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/password_reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('api/password_confirm/<uidb64>/<token>/', PasswordConfirmView.as_view(), name='password_confirm'),
+    path('api/', include('content.api.urls')),
    
     
     # User-Profil
     path('api/', include(api_urls)),
-    #path('api/media/', include(media_urls)),
     
     ## API Schema & Doku
     # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
