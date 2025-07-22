@@ -34,9 +34,8 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').spl
 AUTH_USER_MODEL = 'user_auth_app.User'
 SITE_ID = 1
 
-LOGIN_URL = "/admin"#muss auf die Fronend seite geändert werden
-# Frontend URLs
-FRONTEND_LOGIN_URL = 'http://localhost:4200/login'
+FRONTEND_ACTIVATION_URL = 'http://localhost:5500/pages/auth/activate.html'
+FRONTEND_CONFIRM_PASSWORD_URL = 'http://localhost:5500/pages/auth/confirm_password.html'
 
 # ----------------------------------------
 # Email Backend & SMTP (Django)
@@ -50,43 +49,20 @@ EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # ----------------------------------------
-# Djoser-Konfiguration
-# ----------------------------------------
-DJOSER = {
-    'EMAIL': {
-        'activation': 'user_auth_app.api.emails.CustomActivationEmail',
-        'password_reset': 'user_auth_app.api.emails.CustomPasswordResetEmail',
-    },
-    'SEND_ACTIVATION_EMAIL': True,
-    'SEND_CONFIRMATION_EMAIL': True,
-    'ACTIVATION_URL': 'http://localhost:4200/activate/{uid}/{token}/',    # Frontend-Route :contentReference[oaicite:12]{index=12}
-    'PASSWORD_RESET_CONFIRM_URL': 'http://localhost:4200/password-reset/{uid}/{token}/',
-    'EMAIL_FRONTEND_DOMAIN': 'localhost:4200',                            # für E-Mail-Templates :contentReference[oaicite:13]{index=13}
-    'EMAIL_FRONTEND_PROTOCOL': 'http',
-    'EMAIL_FRONTEND_SITE_NAME': 'Videoflix',
-    'LOGIN_FIELD': 'email',                                              # Login per E-Mail :contentReference[oaicite:14]{index=14}
-    'USER_CREATE_PASSWORD_RETYPE': True,
-    'SET_PASSWORD_RETYPE': True,
-    'SERIALIZERS': {
-        'user_create': 'user_auth_app.api.serializers.UserCreateSerializer',
-        'user': 'user_auth_app.api.serializers.UserSerializer',
-    },
-}
-
-
-# ----------------------------------------
 # Simple JWT Settings
 # ----------------------------------------
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('JWT',),
-    'AUTH_COOKIE': 'access_token',               # changed: cookie name for access
-    'AUTH_COOKIE_REFRESH': 'refresh_token',      # added: cookie name for refresh
-    'AUTH_COOKIE_SAMESITE': 'Lax',               # added: samesite policy
-    'AUTH_COOKIE_SECURE': not DEBUG,             # added: secure flag
+    'AUTH_COOKIE': 'access_token',
+    'AUTH_COOKIE_REFRESH': 'refresh_token',
+    'AUTH_COOKIE_SECURE': False if DEBUG else True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_PATH': '/',
+    'AUTH_COOKIE_SAMESITE': 'Lax' if DEBUG else 'None',
 }
 
 # Application definition
@@ -103,11 +79,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'djoser',
     'user_auth_app',
+    'content.apps.ContentConfig',
     'drf_spectacular',
 ]
-
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -124,17 +99,23 @@ MIDDLEWARE = [
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:5500,http://localhost:5500,http://localhost:4200').split(',')
 
 CORS_ALLOWED_ORIGINS = [
-
-  'http://127.0.0.1:5500',
-  'http://localhost:5500',
-  'http://localhost:4200',
-
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'http://localhost:4200',
 ]
+
 CORS_ALLOW_HEADERS = [
-'content-type',
-'x-csrftoken',
+    'content-type',
+    'x-csrftoken',
+    'authorization',
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+CSRF_COOKIE_SECURE = False if DEBUG else True
+SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+SESSION_COOKIE_SECURE = False if DEBUG else True
 
 ROOT_URLCONF = 'core.urls'
 
@@ -155,7 +136,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -240,30 +220,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'user_auth_app.api.authentication.CookieJWTAuthentication',
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/second',
-        'user': '20/second',
-        'contact': '20/second',
-        'contact-get': '20/second',
-        'contact-post': '20/second'
-        
-    },
     
     #'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
@@ -275,10 +239,4 @@ REST_FRAMEWORK = {
 #     'VERSION': '1.0.0',
 #     'SERVE_INCLUDE_SCHEMA': False,
 # }
-
-# Celery Einstellungen
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
 
