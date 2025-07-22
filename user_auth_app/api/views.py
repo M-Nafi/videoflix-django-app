@@ -13,6 +13,7 @@ from .serializers import (
     LoginSerializer, PasswordResetSerializer, PasswordChangeSerializer
 )
 from .emails import send_verification_email, send_password_reset_email
+from .utils import set_jwt_cookies, clear_jwt_cookies, get_refresh_token_from_request
 
 User = get_user_model()
 
@@ -23,7 +24,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.id)
@@ -123,26 +123,17 @@ class LoginView(APIView):
             }
         }, status=status.HTTP_200_OK)
         
-        response.set_cookie(
-            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
-            value=str(access_token),
-            expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
-        
-        response.set_cookie(
-            key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
-            value=str(refresh),
-            expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
+        set_jwt_cookies(response, access_token, refresh)
         
         csrf_token = get_token(request)
-        response.set_cookie('csrftoken', csrf_token, httponly=False, secure=True, samesite='None', path='/')
+        response.set_cookie(
+            'csrftoken', 
+            csrf_token, 
+            httponly=False, 
+            secure=settings.CSRF_COOKIE_SECURE, 
+            samesite=settings.CSRF_COOKIE_SAMESITE, 
+            path='/'
+        )
         
         return response
         
@@ -154,7 +145,7 @@ class TokenRefreshView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+        refresh_token = get_refresh_token_from_request(request)
         
         if not refresh_token:
             return Response(
@@ -176,14 +167,7 @@ class TokenRefreshView(APIView):
             "access": str(new_access_token)
         }, status=status.HTTP_200_OK)
         
-        response.set_cookie(
-            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
-            value=str(new_access_token),
-            expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
+        set_jwt_cookies(response, new_access_token)
         
         return response
                 
@@ -195,7 +179,7 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+        refresh_token = get_refresh_token_from_request(request)
         
         if not refresh_token:
             return Response(
@@ -212,16 +196,7 @@ class LogoutView(APIView):
             "detail": "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid."
         }, status=status.HTTP_200_OK)
         
-        response.delete_cookie(
-            settings.SIMPLE_JWT['AUTH_COOKIE'],
-            path='/',
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
-        response.delete_cookie(
-            settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
-            path='/',
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-        )
+        clear_jwt_cookies(response)
         
         return response
 
@@ -295,4 +270,3 @@ class PasswordConfirmView(APIView):
             {"detail": "Your Password has been successfully reset."},
             status=status.HTTP_200_OK
         )
-

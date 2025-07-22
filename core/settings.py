@@ -52,16 +52,17 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 # Simple JWT Settings
 # ----------------------------------------
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_HEADER_TYPES': ('JWT',),
     'AUTH_COOKIE': 'access_token',
-    'AUTH_COOKIE_REFRESH': 'refresh_token',     
-    'AUTH_COOKIE_SAMESITE': 'Lax',               
-    'AUTH_COOKIE_SECURE': not DEBUG,             
+    'AUTH_COOKIE_REFRESH': 'refresh_token',
+    'AUTH_COOKIE_SECURE': False if DEBUG else True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_PATH': '/',
+    'AUTH_COOKIE_SAMESITE': 'Lax' if DEBUG else 'None',
 }
 
 # Application definition
@@ -98,17 +99,23 @@ MIDDLEWARE = [
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:5500,http://localhost:5500,http://localhost:4200').split(',')
 
 CORS_ALLOWED_ORIGINS = [
-
-  'http://127.0.0.1:5500',
-  'http://localhost:5500',
-  'http://localhost:4200',
-
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'http://localhost:4200',
 ]
+
 CORS_ALLOW_HEADERS = [
-'content-type',
-'x-csrftoken',
+    'content-type',
+    'x-csrftoken',
+    'authorization',
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+CSRF_COOKIE_SECURE = False if DEBUG else True
+SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+SESSION_COOKIE_SECURE = False if DEBUG else True
 
 ROOT_URLCONF = 'core.urls'
 
@@ -215,28 +222,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        #'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'user_auth_app.api.authentication.CookiesJWTAuthentication',
+        'user_auth_app.api.authentication.CookieJWTAuthentication',
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/second',
-        'user': '20/second',
-        'contact': '20/second',
-        'contact-get': '20/second',
-        'contact-post': '20/second'
-        
-    },
     
     #'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }

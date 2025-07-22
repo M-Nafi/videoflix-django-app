@@ -63,7 +63,6 @@ class VideoListView(APIView):
     FIXED: Robustes Error Handling, besseres Logging
     """
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
         try:
             videos = Video.objects.all().order_by('-upload_date')
@@ -82,10 +81,8 @@ class HLSManifestView(APIView):
     API endpoint to serve HLS master playlist (index.m3u8) files.
     FIXED: Basiert auf funktionierender Referenz-Implementation
     """
-    permission_classes = [AllowAny]
-    authentication_classes = []
     renderer_classes = [M3U8Renderer]
-
+    permission_classes = [IsAuthenticated]
     def get(self, request, movie_id, resolution):
         try:
             video = Video.objects.get(pk=movie_id)
@@ -108,10 +105,8 @@ class HLSSegmentView(APIView):
     API endpoint to serve HLS video segments (.ts files).
     FIXED: Basiert auf funktionierender Referenz-Implementation
     """
-    permission_classes = [AllowAny]
-    authentication_classes = []
     renderer_classes = [TSRenderer]
-
+    permission_classes = [IsAuthenticated]
     def get(self, request, movie_id, resolution, segment):
         try:
             video = Video.objects.get(pk=movie_id)
