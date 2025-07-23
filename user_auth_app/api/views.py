@@ -125,16 +125,6 @@ class LoginView(APIView):
         
         set_jwt_cookies(response, access_token, refresh)
         
-        csrf_token = get_token(request)
-        response.set_cookie(
-            'csrftoken', 
-            csrf_token, 
-            httponly=False, 
-            secure=settings.CSRF_COOKIE_SECURE, 
-            samesite=settings.CSRF_COOKIE_SAMESITE, 
-            path='/'
-        )
-        
         return response
         
 class TokenRefreshView(APIView):

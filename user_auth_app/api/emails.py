@@ -67,7 +67,7 @@ def send_password_reset_email(email: str, uidb64: str, token: str) -> None:
     The email contains a link with a uid and token that can be used to
     reset the password. The link is valid for 24 hours.
     """
-    subject = 'Reset your password - Videoflix'
+    subject = 'Reset your password'
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = [email]
 
@@ -93,7 +93,7 @@ def send_password_reset_email(email: str, uidb64: str, token: str) -> None:
 
     # Render HTML template
     try:
-        html_message = render_to_string('email/reset_password.html', {
+        html_message = render_to_string('email/password_reset.html', {
             'link': link,
             'user_email': email
         })
