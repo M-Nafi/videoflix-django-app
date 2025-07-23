@@ -28,12 +28,12 @@ class VideoAdmin(admin.ModelAdmin):
             'description': 'Automatically generated thumbnail'
         }),
         ('Standard Video Files', {
-            'fields': ('video_180p', 'video_360p', 'video_720p', 'video_1080p'),
+            'fields': ('video_480p', 'video_720p', 'video_1080p'),
             'classes': ('collapse',),
             'description': 'Standard MP4 files in different resolutions (auto-generated)'
         }),
         ('HLS Streaming Files', {
-            'fields': ('hls_180p_manifest', 'hls_360p_manifest', 'hls_720p_manifest', 'hls_1080p_manifest'),
+            'fields': ('hls_480p_manifest', 'hls_720p_manifest', 'hls_1080p_manifest'),
             'classes': ('collapse',),
             'description': 'HLS manifest files for adaptive streaming (auto-generated)'
         }),
@@ -80,7 +80,7 @@ class VideoAdmin(admin.ModelAdmin):
     
     def hls_status(self, obj):
         """Enhanced HLS status with better visuals."""
-        hls_fields = [obj.hls_180p_manifest, obj.hls_360p_manifest, 
+        hls_fields = [obj.hls_480p_manifest, 
                     obj.hls_720p_manifest, obj.hls_1080p_manifest]
         processed_count = sum(1 for field in hls_fields if field)
         

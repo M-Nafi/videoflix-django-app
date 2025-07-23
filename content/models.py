@@ -10,19 +10,15 @@ class Video(models.Model):
         upload_to='videos/thumbnails/', max_length=255, null=True, blank=True)
 
     # Standard video files  
-    video_180p = models.FileField(
-        upload_to='videos/180p/', null=True, blank=True, max_length=255)
-    video_360p = models.FileField(
-        upload_to='videos/360p/', null=True, blank=True, max_length=255)
+    video_480p = models.FileField(
+        upload_to='videos/480p/', null=True, blank=True, max_length=255)
     video_720p = models.FileField(
         upload_to='videos/720p/', null=True, blank=True, max_length=255)
     video_1080p = models.FileField(
         upload_to='videos/1080p/', null=True, blank=True, max_length=255)
 
     # HLS manifests and segments - neue Felder für HLS-Streaming
-    hls_180p_manifest = models.FileField(
-        upload_to='videos/hls/180p/', null=True, blank=True, max_length=255)
-    hls_360p_manifest = models.FileField(
+    hls_480p_manifest = models.FileField(
         upload_to='videos/hls/360p/', null=True, blank=True, max_length=255)
     hls_720p_manifest = models.FileField(
         upload_to='videos/hls/720p/', null=True, blank=True, max_length=255)

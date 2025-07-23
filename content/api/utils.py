@@ -80,14 +80,13 @@ def get_hls_manifest_by_resolution(video, resolution: str):
 
     Args:
         video: Video model instance containing different HLS manifest fields.
-        resolution (str): Resolution key ('180p', '360p', '720p', '1080p').
+        resolution (str): Resolution key ('480p', '720p', '1080p').
 
     Returns:
         The HLS manifest file corresponding to the resolution or None if not found.
     """
     manifest_map = {
-        '180p': video.hls_180p_manifest,
-        '360p': video.hls_360p_manifest,
+        '480p': video.hls_480p_manifest,
         '720p': video.hls_720p_manifest,
         '1080p': video.hls_1080p_manifest,
     }
@@ -100,7 +99,7 @@ def get_hls_segment_path(video, resolution: str, segment_filename: str) -> str:
 
     Args:
         video: Video model instance.
-        resolution (str): Resolution key ('180p', '360p', '720p', '1080p').
+        resolution (str): Resolution key ('480p', '720p', '1080p').
         segment_filename (str): Name of the segment file (e.g., '000.ts').
 
     Returns:

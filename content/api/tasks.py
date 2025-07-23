@@ -18,7 +18,7 @@ def process_video(video_id):
     Process:
         - Retrieves the Video object by ID.
         - Extracts the original video file path and base filename.
-        - Converts the video into multiple standard resolutions (180p, 360p, 720p, 1080p).
+        - Converts the video into multiple standard resolutions (480p, 720p, 1080p).
         - Creates HLS streams for each resolution with adaptive segments.
         - Generates a thumbnail image from the original video.
         - Updates the Video model instance with all file paths.
@@ -48,7 +48,7 @@ def process_video(video_id):
 
 def _convert_standard_resolutions(video, input_path: str, base_filename: str, media_root: str):
     """
-    Convert video to standard resolutions (180p, 360p, 720p, 1080p).
+    Convert video to standard resolutions (480p, 720p, 1080p).
     
     Args:
         video: Video model instance to update.
@@ -56,7 +56,7 @@ def _convert_standard_resolutions(video, input_path: str, base_filename: str, me
         base_filename (str): Base filename without extension.
         media_root (str): Media root directory path.
     """
-    resolutions = [180, 360, 720, 1080]
+    resolutions = [480, 720, 1080]
     for res in resolutions:
         output_path = os.path.join(
             media_root, f'videos/{res}p/{base_filename}_{res}p.mp4')
@@ -76,7 +76,7 @@ def _convert_hls_streams(video, input_path: str, base_filename: str, media_root:
         base_filename (str): Base filename without extension.
         media_root (str): Media root directory path.
     """
-    resolutions = [180, 360, 720, 1080]
+    resolutions = [480, 720, 1080]
     for res in resolutions:
         hls_dir = os.path.join(media_root, f'videos/hls/{res}p/{base_filename}')
         os.makedirs(hls_dir, exist_ok=True)

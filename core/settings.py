@@ -59,10 +59,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'AUTH_COOKIE': 'access_token',
     'AUTH_COOKIE_REFRESH': 'refresh_token',
-    'AUTH_COOKIE_SECURE': False if DEBUG else True,
+    'AUTH_COOKIE_SECURE': True,
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
-    'AUTH_COOKIE_SAMESITE': 'Lax' if DEBUG else 'None',
+    'AUTH_COOKIE_SAMESITE': 'None',
 }
 
 # Application definition
@@ -112,10 +112,10 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
-CSRF_COOKIE_SECURE = False if DEBUG else False
-SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
-SESSION_COOKIE_SECURE = False if DEBUG else False
+CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'core.urls'
 
@@ -239,4 +239,3 @@ REST_FRAMEWORK = {
 #     'VERSION': '1.0.0',
 #     'SERVE_INCLUDE_SCHEMA': False,
 # }
-
