@@ -15,8 +15,8 @@ def set_jwt_cookies(response, access_token, refresh_token=None):
         key=jwt_settings.get('AUTH_COOKIE', 'access_token'),
         value=str(access_token),
         httponly=jwt_settings.get('AUTH_COOKIE_HTTP_ONLY', True),
-        secure=jwt_settings.get('AUTH_COOKIE_SECURE', True),
-        samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'None'),
+        secure=jwt_settings.get('AUTH_COOKIE_SECURE', False),
+        samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'Lax'),
         path=jwt_settings.get('AUTH_COOKIE_PATH', '/'),
     )
     
@@ -25,8 +25,8 @@ def set_jwt_cookies(response, access_token, refresh_token=None):
             key=jwt_settings.get('AUTH_COOKIE_REFRESH', 'refresh_token'),
             value=str(refresh_token),
             httponly=jwt_settings.get('AUTH_COOKIE_HTTP_ONLY', True),
-            secure=jwt_settings.get('AUTH_COOKIE_SECURE', True),
-            samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'None'),
+            secure=jwt_settings.get('AUTH_COOKIE_SECURE', False),
+            samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'Lax'),
             path=jwt_settings.get('AUTH_COOKIE_PATH', '/'),
         )
 
@@ -44,8 +44,8 @@ def clear_jwt_cookies(response):
         value='',
         max_age=0,
         httponly=jwt_settings.get('AUTH_COOKIE_HTTP_ONLY', True),
-        secure=jwt_settings.get('AUTH_COOKIE_SECURE', True),
-        samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'None'),
+        secure=jwt_settings.get('AUTH_COOKIE_SECURE', False),
+        samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'Lax'),
         path=jwt_settings.get('AUTH_COOKIE_PATH', '/'),
     )
     
@@ -54,8 +54,8 @@ def clear_jwt_cookies(response):
         value='',
         max_age=0,
         httponly=jwt_settings.get('AUTH_COOKIE_HTTP_ONLY', True),
-        secure=jwt_settings.get('AUTH_COOKIE_SECURE', True),
-        samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'None'),
+        secure=jwt_settings.get('AUTH_COOKIE_SECURE', False),
+        samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'Lax'),
         path=jwt_settings.get('AUTH_COOKIE_PATH', '/'),
     )
 
