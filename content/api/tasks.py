@@ -8,22 +8,8 @@ from .utils import convert_video, convert_video_to_hls, generate_thumbnail
 
 @job
 def process_video(video_id):
-    """
-    Background job to process an uploaded video by converting it to multiple resolutions,
-    generating HLS streams, and creating a thumbnail image.
-
-    Args:
-        video_id (int): The primary key of the Video instance to process.
-
-    Process:
-        - Retrieves the Video object by ID.
-        - Extracts the original video file path and base filename.
-        - Converts the video into multiple standard resolutions (480p, 720p, 1080p).
-        - Creates HLS streams for each resolution with adaptive segments.
-        - Generates a thumbnail image from the original video.
-        - Updates the Video model instance with all file paths.
-        - Saves the updated Video instance.
-    """
+    """Background job to process uploaded video by converting to multiple resolutions and generating HLS streams."""
+    
     try:
         video = Video.objects.get(id=video_id)
     except Video.DoesNotExist:
@@ -33,29 +19,20 @@ def process_video(video_id):
     if not video.original_file:
         print(f"ERROR: Video {video_id} has no original_file. Task aborted.")
         return
+    
     input_path = video.original_file.path
     base_filename = os.path.splitext(os.path.basename(input_path))[0]
     media_root = settings.MEDIA_ROOT
-
-    # _convert_standard_resolutions(video, input_path, base_filename, media_root)
     
     _convert_hls_streams(video, input_path, base_filename, media_root)
-    
     _generate_video_thumbnail(video, input_path, base_filename, media_root)
     
     video.save()
 
 
 def _convert_standard_resolutions(video, input_path: str, base_filename: str, media_root: str):
-    """
-    Convert video to standard resolutions (480p, 720p, 1080p).
+    """Convert video to standard resolutions (480p, 720p, 1080p)."""
     
-    Args:
-        video: Video model instance to update.
-        input_path (str): Path to the original video file.
-        base_filename (str): Base filename without extension.
-        media_root (str): Media root directory path.
-    """
     resolutions = [480, 720, 1080]
     for res in resolutions:
         output_path = os.path.join(
@@ -67,15 +44,8 @@ def _convert_standard_resolutions(video, input_path: str, base_filename: str, me
 
 
 def _convert_hls_streams(video, input_path: str, base_filename: str, media_root: str):
-    """
-    Convert video to HLS streams for adaptive streaming.
+    """Convert video to HLS streams for adaptive streaming."""
     
-    Args:
-        video: Video model instance to update.
-        input_path (str): Path to the original video file.
-        base_filename (str): Base filename without extension.
-        media_root (str): Media root directory path.
-    """
     resolutions = [480, 720, 1080]
     for res in resolutions:
         hls_dir = os.path.join(media_root, f'videos/hls/{res}p/{base_filename}')
@@ -87,15 +57,8 @@ def _convert_hls_streams(video, input_path: str, base_filename: str, media_root:
 
 
 def _generate_video_thumbnail(video, input_path: str, base_filename: str, media_root: str):
-    """
-    Generate thumbnail image for the video.
+    """Generate thumbnail image for the video."""
     
-    Args:
-        video: Video model instance to update.
-        input_path (str): Path to the original video file.
-        base_filename (str): Base filename without extension.
-        media_root (str): Media root directory path.
-    """
     thumbnail_path = os.path.join(
         media_root, f'videos/thumbnails/{base_filename}.jpg')
     os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)

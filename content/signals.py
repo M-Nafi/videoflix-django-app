@@ -6,10 +6,7 @@ from .api.tasks import process_video
 
 @receiver(post_save, sender=Video)
 def trigger_processing(sender, instance, created, **kwargs):
-    """
-    Trigger video processing after Video creation.
-    Uses transaction.on_commit() to ensure the video is actually
-    saved to the database before the background task starts.
-    """
+    """Trigger video processing after Video creation."""
+    
     if created:
         transaction.on_commit(lambda: process_video.delay(instance.id))

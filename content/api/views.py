@@ -5,7 +5,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.renderers import BaseRenderer
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.http import Http404, FileResponse
 from django.conf import settings
 
@@ -36,11 +36,8 @@ class TSRenderer(BaseRenderer):
         return data
 
 class VideoUploadView(APIView):
-    """
-    API endpoint to upload videos.
-    Accepts multipart/form-data for video upload.
-    Triggers asynchronous processing after saving.
-    """
+    """API endpoint to upload videos and trigger asynchronous processing."""
+    
     permission_classes = [IsAdminUser]
     authentication_classes = []
     parser_classes = [MultiPartParser, FormParser]
@@ -50,19 +47,16 @@ class VideoUploadView(APIView):
         if serializer.is_valid():
             video = serializer.save()
             return Response(
-                {"detail": "Video hochgeladen. Verarbeitung läuft im Hintergrund."},
+                {"detail": "Video uploaded. Processing started in background."},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VideoListView(APIView):
-    """
-    API endpoint to list all videos according to API specification.
-    Returns: id, created_at, title, description, thumbnail_url, category
+    """API endpoint to list all videos."""
     
-    FIXED: Robustes Error Handling, besseres Logging
-    """
     permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         try:
             videos = Video.objects.all().order_by('-upload_date')
@@ -77,17 +71,16 @@ class VideoListView(APIView):
             )
 
 class HLSManifestView(APIView):
-    """
-    API endpoint to serve HLS master playlist (index.m3u8) files.
-    FIXED: Basiert auf funktionierender Referenz-Implementation
-    """
+    """API endpoint to serve HLS master playlist files."""
+    
     renderer_classes = [M3U8Renderer]
     permission_classes = [IsAuthenticated]
+    
     def get(self, request, movie_id, resolution):
         try:
             video = Video.objects.get(pk=movie_id)
         except Video.DoesNotExist:
-            raise Http404("Video nicht gefunden.")
+            raise Http404("Video not found.")
         
         media_root = settings.MEDIA_ROOT
         basename, _ = os.path.splitext(os.path.basename(video.original_file.name))
@@ -95,23 +88,22 @@ class HLSManifestView(APIView):
         manifest_path = os.path.join(hls_dir, "index.m3u8")
         
         if not os.path.isfile(manifest_path):
-            raise Http404("HLS-Manifest nicht gefunden.")
+            raise Http404("HLS manifest not found.")
         
         return FileResponse(open(manifest_path, "rb"), content_type="application/vnd.apple.mpegurl")
 
 
 class HLSSegmentView(APIView):
-    """
-    API endpoint to serve HLS video segments (.ts files).
-    FIXED: Basiert auf funktionierender Referenz-Implementation
-    """
+    """API endpoint to serve HLS video segments."""
+    
     renderer_classes = [TSRenderer]
     permission_classes = [IsAuthenticated]
+    
     def get(self, request, movie_id, resolution, segment):
         try:
             video = Video.objects.get(pk=movie_id)
         except Video.DoesNotExist:
-            raise Http404("Video nicht gefunden.")
+            raise Http404("Video not found.")
         
         media_root = settings.MEDIA_ROOT
         basename, _ = os.path.splitext(os.path.basename(video.original_file.name))
@@ -119,6 +111,6 @@ class HLSSegmentView(APIView):
         segment_path = os.path.join(hls_dir, segment)
         
         if not os.path.isfile(segment_path):
-            raise Http404("HLS-Segment nicht gefunden.")
+            raise Http404("HLS segment not found.")
         
         return FileResponse(open(segment_path, "rb"), content_type="video/MP2T")

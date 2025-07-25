@@ -1,13 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.middleware.csrf import get_token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
-from core import settings
 from .serializers import (
     UserSerializer, UserCreateSerializer, 
     LoginSerializer, PasswordResetSerializer, PasswordChangeSerializer
@@ -19,9 +17,8 @@ User = get_user_model()
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    """
-    Retrieve and update the authenticated user's profile.
-    """
+    """Retrieve and update the authenticated user's profile."""
+    
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -30,10 +27,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 
 class RegisterView(APIView):
-    """
-    POST /api/register/
-    Creates a new user. Returns token that can be used for authentication.
-    """
+    """Handle user registration and send activation email."""
+    
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -62,10 +57,8 @@ class RegisterView(APIView):
 
 
 class ActivateView(APIView):
-    """
-    GET /api/activate/<uidb64>/<token>/
-    Activate a new user. Returns activation status message.
-    """
+    """Activate user account using token from email."""
+    
     permission_classes = [AllowAny]
 
     def get(self, request, uidb64, token):
@@ -97,10 +90,8 @@ class ActivateView(APIView):
             )
     
 class LoginView(APIView):
-    """
-    POST /api/login/
-    Handle user login requests and set JWT tokens in secure HTTP-only cookies.
-    """
+    """Handle user login and set JWT tokens in cookies."""
+    
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -128,10 +119,8 @@ class LoginView(APIView):
         return response
         
 class TokenRefreshView(APIView):
-    """
-    POST /api/token/refresh/
-    Refresh the JWT access token using the refresh token from cookies.
-    """
+    """Refresh JWT access token using refresh token from cookies."""
+    
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -162,10 +151,8 @@ class TokenRefreshView(APIView):
         return response
                 
 class LogoutView(APIView):
-    """
-    POST /api/logout/
-    Log out the user by clearing JWT cookies and blacklisting refresh token.
-    """
+    """Log out user by clearing JWT cookies and blacklisting refresh token."""
+    
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -191,10 +178,8 @@ class LogoutView(APIView):
         return response
 
 class PasswordResetView(APIView):
-    """
-    POST /api/password_reset/
-    Handle password reset requests by sending email with reset link.
-    """
+    """Handle password reset requests by sending email with reset link."""
+    
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -225,10 +210,8 @@ class PasswordResetView(APIView):
 
 
 class PasswordConfirmView(APIView):
-    """
-    POST /api/password_confirm/<uidb64>/<token>/
-    Handle password confirm requests and change user password.
-    """
+    """Handle password reset confirmation and update user password."""
+    
     permission_classes = [AllowAny]
 
     def post(self, request, uidb64, token):

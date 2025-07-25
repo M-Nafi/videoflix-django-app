@@ -4,16 +4,13 @@ from .models import Video
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-    """
-    Admin interface for the Video model with HLS streaming support.
-    """
-    # List view configuration
+    """Admin interface for the Video model with HLS streaming support."""
+    
     list_display = ('title', 'genre', 'upload_date', 'has_thumbnail', 'hls_status')
     search_fields = ('title', 'description', 'genre')
     list_filter = ('genre', 'upload_date')
     ordering = ('-upload_date',)
     
-    # Detail view configuration
     fieldsets = (
         ('Basic Video Information', {
             'fields': ('title', 'description', 'genre')
@@ -43,11 +40,8 @@ class VideoAdmin(admin.ModelAdmin):
         }),
     )
     
-    
-    # Read-only fields
     readonly_fields = ('upload_date',)
 
-    
     def thumbnail_preview(self, obj):
         """Show thumbnail preview in admin."""
         if obj.thumbnail:
@@ -71,7 +65,6 @@ class VideoAdmin(admin.ModelAdmin):
                 return "Unknown"
         return "No file"
     
-    # Custom admin methods
     def has_thumbnail(self, obj):
         """Check if video has a thumbnail."""
         return bool(obj.thumbnail)
@@ -79,24 +72,22 @@ class VideoAdmin(admin.ModelAdmin):
     has_thumbnail.short_description = 'Thumbnail'
     
     def hls_status(self, obj):
-        """Enhanced HLS status with better visuals."""
+        """Show HLS processing status."""
         hls_fields = [obj.hls_480p_manifest, 
                     obj.hls_720p_manifest, obj.hls_1080p_manifest]
         processed_count = sum(1 for field in hls_fields if field)
         
         if processed_count == 0:
             return "Pending"
-        elif processed_count == 4:
+        elif processed_count == 3:
             return "Complete"
         else:
-            return f"Partial ({processed_count}/4)"
+            return f"Partial ({processed_count}/3)"
     
-    # Performance optimization
     def get_queryset(self, request):
         """Optimize queryset for admin list view."""
         return super().get_queryset(request).select_related()
     
-    # Custom actions
     actions = ['reprocess_hls']
     
     def reprocess_hls(self, request, queryset):

@@ -4,13 +4,13 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    """Custom admin interface for User model."""
+    
     model = User
 
-    # Zeige im Listen-View E-Mail, Aktiviert-Status, An‐/Abmelde-Zeit
     list_display = ('email','is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login')
     list_filter  = ('is_active',)
 
-    # Da wir username nicht mehr nutzen, reduzieren wir die Felder
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Permissions', {'fields': ('is_active','is_staff','is_superuser')}),

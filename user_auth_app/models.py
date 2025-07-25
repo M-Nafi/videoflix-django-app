@@ -2,9 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class CustomUserManager(BaseUserManager):
-    """
-    Custom manager for User model using email as the unique identifier.
-    """
+    """Custom manager for User model using email as unique identifier."""
+    
     use_in_migrations = True
 
     def create_user(self, email, password=None, **extra_fields):
@@ -28,10 +27,8 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
-    """
-    Custom user model that replaces the default username field with an email address,
-    but reintroduces username as an optional field so scripts/tools expecting it still work.
-    """
+    """Custom user model with email as username field."""
+    
     username = models.CharField(
         'username',
         max_length=150,
@@ -50,5 +47,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
-    
-    
