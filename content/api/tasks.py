@@ -3,7 +3,7 @@ from django.conf import settings
 from content.models import Video
 from django_rq import job
 
-from .utils import convert_video, convert_video_to_hls, generate_thumbnail
+from .utils import convert_video_to_hls, generate_thumbnail
 
 
 @job
@@ -28,19 +28,6 @@ def process_video(video_id):
     _generate_video_thumbnail(video, input_path, base_filename, media_root)
     
     video.save()
-
-
-def _convert_standard_resolutions(video, input_path: str, base_filename: str, media_root: str):
-    """Convert video to standard resolutions (480p, 720p, 1080p)."""
-    
-    resolutions = [480, 720, 1080]
-    for res in resolutions:
-        output_path = os.path.join(
-            media_root, f'videos/{res}p/{base_filename}_{res}p.mp4')
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        convert_video(input_path, output_path, res)
-        setattr(video, f'video_{res}p',
-                f'videos/{res}p/{base_filename}_{res}p.mp4')
 
 
 def _convert_hls_streams(video, input_path: str, base_filename: str, media_root: str):

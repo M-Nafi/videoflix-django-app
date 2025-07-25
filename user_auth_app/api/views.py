@@ -4,8 +4,9 @@ from django.utils.encoding import force_bytes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
+from core import settings
 from .serializers import (
     UserSerializer, UserCreateSerializer, 
     LoginSerializer, PasswordResetSerializer, PasswordChangeSerializer
@@ -170,7 +171,7 @@ class LogoutView(APIView):
             pass
         
         response = Response({
-            "detail": "Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid."
+            "detail": "Log-Out successfully!"
         }, status=status.HTTP_200_OK)
         
         clear_jwt_cookies(response)
@@ -240,6 +241,6 @@ class PasswordConfirmView(APIView):
         user.save()
         
         return Response(
-            {"detail": "Your Password has been successfully reset."},
+            {"detail": "Your password has been successfully reset."},
             status=status.HTTP_200_OK
         )

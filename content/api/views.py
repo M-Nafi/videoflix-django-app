@@ -47,7 +47,7 @@ class VideoUploadView(APIView):
         if serializer.is_valid():
             video = serializer.save()
             return Response(
-                {"detail": "Video uploaded. Processing started in background."},
+                {"detail": "Video uploaded successfully. Processing started in background."},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
