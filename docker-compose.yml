@@ -1,68 +1,43 @@
 services:
-    db:
-        image: postgres:latest
-        container_name: videoflix_database
-        environment:
-            POSTGRES_DB: ${DB_NAME}
-            POSTGRES_USER: ${DB_USER}
-            POSTGRES_PASSWORD: ${DB_PASSWORD}
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
-        # Füge einen Healthcheck hinzu, damit der Web-Service wirklich erst startet, wenn die DB bereit ist
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
 
-    redis:
-        image: redis:latest
-        container_name: videoflix_redis
-        volumes:
-            - redis_data:/data
+  db:
+    image: postgres:latest
+    container_name: videoflix_database
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-    web:
-        build:
-            context: .
-            dockerfile: backend.Dockerfile
-        env_file: .env
-        container_name: videoflix_backend
+  redis:
+    image: redis:latest
+    container_name: videoflix_redis
+    volumes:
+      - redis_data:/data
 
-        # NEU: Überschreibt den ENTRYPOINT aus dem Dockerfile.
-        # Dies ist der empfohlene Weg für die Entwicklung.
-        command: >
-            sh -c "
-              echo 'Warten auf die Datenbank...'
-              
-              echo 'Datenbank-Migrationen werden ausgeführt...'
-              python manage.py collectstatic --noinput
-              python manage.py makemigrations
-              python manage.py migrate
-              
-              echo 'Starte RQ Worker im Hintergrund...'
-              python manage.py rqworker default &
+  web:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    env_file: .env
+    container_name: videoflix_backend
 
-              echo 'Starte den Entwicklungsserver mit Live-Reload...'
-              python manage.py runserver 0.0.0.0:8000
-            "
+    volumes:
+      - .:/app
+      - videoflix_media:/app/media
+      - videoflix_static:/app/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
 
-        volumes:
-            # Dies ist der wichtigste Teil für Live-Reload:
-            # Dein lokaler Code-Ordner wird in den Container gespiegelt.
-            - .:/app
-            - videoflix_media:/app/media
-            - videoflix_static:/app/static
-        ports:
-            - "8000:8000"
-        depends_on:
-            db:
-                # Wartet, bis die Datenbank den Healthcheck besteht
-                condition: service_healthy
-            redis:
-                condition: service_started
+
+
 
 volumes:
-    postgres_data: null
-    redis_data: null
-    videoflix_media: null
-    videoflix_static: null
+  postgres_data:
+  redis_data:
+  videoflix_media:
+  videoflix_static:
