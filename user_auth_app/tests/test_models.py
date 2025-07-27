@@ -10,7 +10,7 @@ def test_create_user():
     user = User.objects.create_user(
         email='test@test.com',
         password='TestPassword123!',
-        username='test@test.com'  # Explicitly set username
+        username='test@test.com'
     )
     assert user.email == 'test@test.com'
     assert user.username == 'test@test.com'
@@ -27,7 +27,7 @@ def test_create_user_without_username():
         password='TestPassword123!'
     )
     assert user.email == 'test2@test.com'
-    assert user.username is None  # Username can be None
+    assert user.username is None
     assert user.is_active is False
     assert user.is_staff is False
     assert user.is_superuser is False

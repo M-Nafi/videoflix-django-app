@@ -31,7 +31,6 @@ def clear_jwt_cookies(response):
     """
     jwt_settings = settings.SIMPLE_JWT
     
-    # Lösche access_token Cookie
     response.delete_cookie(
         key=jwt_settings.get('AUTH_COOKIE', 'access_token'),
         path=jwt_settings.get('AUTH_COOKIE_PATH', '/'),
@@ -39,7 +38,6 @@ def clear_jwt_cookies(response):
         samesite=jwt_settings.get('AUTH_COOKIE_SAMESITE', 'Lax')
     )
     
-    # Lösche refresh_token Cookie  
     response.delete_cookie(
         key=jwt_settings.get('AUTH_COOKIE_REFRESH', 'refresh_token'),
         path=jwt_settings.get('AUTH_COOKIE_PATH', '/'),

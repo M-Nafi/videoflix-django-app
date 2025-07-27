@@ -30,7 +30,6 @@ class VideoListSerializer(serializers.ModelSerializer):
         
         if obj.thumbnail:
             try:
-                # Teste erst hasattr in try/except block
                 if hasattr(obj.thumbnail, 'url'):
                     thumbnail_url = obj.thumbnail.url
                     if request:
