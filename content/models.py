@@ -31,7 +31,7 @@ class Video(models.Model):
         ('drama', 'Drama'),
         ('documentary', 'Documentary'),
         ('horror', 'Horror'),
-        ('sci-fi', 'Science Fiction'),
+        ('sci_fi', 'Sci-Fi'),
         ('thriller', 'Thriller'),
         ('romance', 'Romance'),
         ('animation', 'Animation'),
@@ -45,4 +45,7 @@ class Video(models.Model):
     @property
     def category(self):
         """Map genre to category for API compatibility."""
-        return self.genre.title()
+        return self.get_genre_display()
+
+    class Meta:
+        ordering = ['-upload_date']

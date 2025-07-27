@@ -155,7 +155,7 @@ def test_video_list_multiple_genres(client):
         is_active=True
     )
     
-    genres = ['action', 'comedy', 'drama', 'horror', 'sci-fi']
+    genres = ['action', 'comedy', 'drama', 'horror', 'sci_fi']
     for i, genre in enumerate(genres):
         Video.objects.create(
             title=f'Video {i+1}',

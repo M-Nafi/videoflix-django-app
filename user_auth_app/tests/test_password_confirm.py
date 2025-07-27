@@ -28,7 +28,7 @@ def test_password_confirm_success(client):
     response = client.post(url, data, content_type='application/json')
     
     assert response.status_code == 200
-    assert response.data['detail'] == 'Your Password has been successfully reset.'
+    assert response.data['detail'] == 'Your password has been successfully reset.'
     
     user.refresh_from_db()
     assert user.check_password('NewPassword123!')

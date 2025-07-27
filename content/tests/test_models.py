@@ -31,7 +31,7 @@ def test_video_category_property():
         ('action', 'Action'),
         ('comedy', 'Comedy'),
         ('drama', 'Drama'),
-        ('sci-fi', 'Sci-Fi'),
+        ('sci_fi', 'Sci-Fi'),
         ('horror', 'Horror')
     ]
     
@@ -48,7 +48,7 @@ def test_video_genre_choices():
     """Test video genre choices validation."""
     valid_genres = [
         'action', 'comedy', 'drama', 'documentary', 'horror',
-        'sci-fi', 'thriller', 'romance', 'animation', 'fantasy'
+        'sci_fi', 'thriller', 'romance', 'animation', 'fantasy'
     ]
     
     for genre in valid_genres:
@@ -67,7 +67,7 @@ def test_video_fields_optional():
         description='Minimal Description',
         genre='action'
     )
-    assert video.thumbnail is None or video.thumbnail == ''
-    assert video.video_480p is None or video.video_480p == ''
-    assert video.video_720p is None or video.video_720p == ''
-    assert video.video_1080p is None or video.video_1080p == ''
+    assert not video.thumbnail or video.thumbnail.name == ''
+    assert not video.video_480p or video.video_480p.name == ''
+    assert not video.video_720p or video.video_720p.name == ''
+    assert not video.video_1080p or video.video_1080p.name == ''

@@ -6,13 +6,28 @@ User = get_user_model()
 
 @pytest.mark.django_db
 def test_create_user():
-    """Test creating a regular user."""
+    """Test creating a regular user with username."""
     user = User.objects.create_user(
         email='test@test.com',
-        password='TestPassword123!'
+        password='TestPassword123!',
+        username='test@test.com'  # Explicitly set username
     )
     assert user.email == 'test@test.com'
     assert user.username == 'test@test.com'
+    assert user.is_active is False
+    assert user.is_staff is False
+    assert user.is_superuser is False
+    assert user.check_password('TestPassword123!')
+
+@pytest.mark.django_db
+def test_create_user_without_username():
+    """Test creating a regular user without username (should be allowed)."""
+    user = User.objects.create_user(
+        email='test2@test.com',
+        password='TestPassword123!'
+    )
+    assert user.email == 'test2@test.com'
+    assert user.username is None  # Username can be None
     assert user.is_active is False
     assert user.is_staff is False
     assert user.is_superuser is False

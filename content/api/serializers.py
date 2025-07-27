@@ -28,13 +28,15 @@ class VideoListSerializer(serializers.ModelSerializer):
         """Return the absolute URL of the thumbnail image."""
         request = self.context.get('request')
         
-        if obj.thumbnail and hasattr(obj.thumbnail, 'url'):
+        if obj.thumbnail:
             try:
-                thumbnail_url = obj.thumbnail.url
-                if request:
-                    return request.build_absolute_uri(thumbnail_url)
-                return thumbnail_url
-            except (ValueError, OSError):
+                # Teste erst hasattr in try/except block
+                if hasattr(obj.thumbnail, 'url'):
+                    thumbnail_url = obj.thumbnail.url
+                    if request:
+                        return request.build_absolute_uri(thumbnail_url)
+                    return thumbnail_url
+            except (ValueError, OSError, AttributeError):
                 logger.debug(f"Thumbnail file missing for video {obj.id}")
                 return None
         

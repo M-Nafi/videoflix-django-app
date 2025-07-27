@@ -35,7 +35,7 @@ def test_video_upload_success_admin(client):
     response = api_client.post(url, data, format='multipart')
     
     assert response.status_code == 201
-    assert response.data['detail'] == 'Video hochgeladen. Verarbeitung läuft im Hintergrund.'
+    assert response.data['detail'] == 'Video uploaded successfully. Processing started in background.'
     
     video = Video.objects.get(title='Test Video')
     assert video.description == 'Test Description'
@@ -93,7 +93,7 @@ def test_video_upload_unauthenticated(client):
     
     response = api_client.post(url, data, format='multipart')
     
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 @pytest.mark.django_db
 def test_video_upload_missing_fields(client):

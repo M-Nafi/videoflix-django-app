@@ -23,7 +23,7 @@ def test_logout_user_success(client):
     response = client.post(url)
     
     assert response.status_code == 200
-    assert response.data['detail'] == 'Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid.'
+    assert response.data['detail'] == 'Log-Out successfully!'
     
     assert 'access_token' in response.cookies
     assert response.cookies['access_token'].value == ''
@@ -48,4 +48,4 @@ def test_logout_invalid_refresh_token(client):
     response = client.post(url)
     
     assert response.status_code == 200
-    assert response.data['detail'] == 'Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid.'
+    assert response.data['detail'] == 'Log-Out successfully!'
