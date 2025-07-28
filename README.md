@@ -49,7 +49,7 @@ A Django REST Framework backend for a video streaming service similar to Netflix
 4. Start the Docker containers:
 
     ```bash
-    docker compose up --build
+    docker-compose up --build
     ```
 
 5. The backend will be available at:
