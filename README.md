@@ -129,3 +129,11 @@ For local development:
 ## Note
 
 This project is intended for educational purposes and serves as an example implementation of a Django and DRF-based video streaming service.
+
+## Contributors
+
+This project was developed by three contributors:
+
+- [Mario Winter](https://github.com/MarioWinter)
+- [Marco Angermann](https://github.com/MarcoAngermann)
+- [Nafi Müftüoglu](https://github.com/M-Nafi)
